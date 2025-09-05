@@ -55,3 +55,5 @@ docker-compose.override.yml
 
 # drizzle migration files
 \migrations
+
+\my-nextjs-app
