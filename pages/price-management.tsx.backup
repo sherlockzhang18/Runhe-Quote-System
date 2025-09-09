@@ -179,7 +179,7 @@ export default function PriceManagement() {
       }
     });
 
-  // 获取唯一的分类和材质选项
+  // 获取唯一的分类和材料选项
   const uniqueCategories1 = [...new Set(priceItems.map(item => item.category1).filter(Boolean))] as string[];
   const uniqueCategories2 = [...new Set(priceItems.map(item => item.category2).filter(Boolean))] as string[];
   const uniqueMaterials = [...new Set(priceItems.map(item => item.material).filter(Boolean))] as string[];
@@ -440,7 +440,7 @@ export default function PriceManagement() {
             <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
               <TextField
                 size="small"
-                placeholder="搜索分类、材质..."
+                placeholder="搜索分类、材料..."
                 value={filters.search}
                 onChange={(e) => setFilters({...filters, search: e.target.value})}
                 sx={{ minWidth: 200 }}
@@ -470,7 +470,7 @@ export default function PriceManagement() {
                 </Select>
               </FormControl>
               <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>材质</InputLabel>
+                <InputLabel>材料</InputLabel>
                 <Select
                   value={filters.material}
                   onChange={(e) => setFilters({...filters, material: e.target.value})}
@@ -667,6 +667,7 @@ export default function PriceManagement() {
                 Excel文件导入
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                请选择包含价格数据的Excel文件。文件应包含以下列：一级分类、二级分类、三级分类、材料、厚度、最小孔距、最大孔距、最小孔数、最大孔数、F25价格、F26价格、F27价格、F28价格、螺纹价格、开槽价格。
               </Typography>
 
               <Box sx={{ mb: 3 }}>
@@ -733,46 +734,31 @@ export default function PriceManagement() {
                   value={formData.category1}
                   onChange={(e) => setFormData({...formData, category1: e.target.value})}
                 >
-                  <MenuItem value="钻孔">钻孔</MenuItem>
-                  <MenuItem value="扣槽">扣槽</MenuItem>
-                  <MenuItem value="螺纹盲孔">螺纹盲孔</MenuItem>
-                  <MenuItem value="螺纹通孔">螺纹通孔</MenuItem>
+                  <MenuItem value="机械零件">机械零件</MenuItem>
+                  <MenuItem value="紧固件">紧固件</MenuItem>
+                  <MenuItem value="标准件">标准件</MenuItem>
+                  <MenuItem value="其他">其他</MenuItem>
                 </Select>
               </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>二级分类</InputLabel>
-                <Select
-                  value={formData.category2}
-                  onChange={(e) => setFormData({...formData, category2: e.target.value})}
-                >
-                  <MenuItem value="">无</MenuItem>
-                  <MenuItem value="ABS">ABS</MenuItem>
-                  <MenuItem value="非ABS">非ABS</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>三级分类</InputLabel>
-                <Select
-                  value={formData.category3}
-                  onChange={(e) => setFormData({...formData, category3: e.target.value})}
-                >
-                  <MenuItem value="">无</MenuItem>
-                  <MenuItem value="尖底">尖底</MenuItem>
-                  <MenuItem value="平底">平底</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>材质</InputLabel>
-                <Select
-                  value={formData.material}
-                  onChange={(e) => setFormData({...formData, material: e.target.value})}
-                >
-                  <MenuItem value="">无</MenuItem>
-                  <MenuItem value="不锈钢">不锈钢</MenuItem>
-                  <MenuItem value="普通材质">普通材质</MenuItem>
-                  <MenuItem value="09MnNiDⅢ">09MnNiDⅢ</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                label="二级分类"
+                value={formData.category2}
+                onChange={(e) => setFormData({...formData, category2: e.target.value})}
+                fullWidth
+              />
+              <TextField
+                label="三级分类"
+                value={formData.category3}
+                onChange={(e) => setFormData({...formData, category3: e.target.value})}
+                fullWidth
+              />
+              <TextField
+                label="材料"
+                value={formData.material}
+                onChange={(e) => setFormData({...formData, material: e.target.value})}
+                fullWidth
+                required
+              />
               <TextField
                 label="厚度"
                 type="number"
@@ -781,17 +767,17 @@ export default function PriceManagement() {
                 fullWidth
               />
               <TextField
-                label="最小孔径"
+                label="最小孔距"
                 type="number"
-                value={formData.minHoleDiameter}
-                onChange={(e) => setFormData({...formData, minHoleDiameter: e.target.value})}
+                value={formData.minHoleDistance}
+                onChange={(e) => setFormData({...formData, minHoleDistance: e.target.value})}
                 fullWidth
               />
               <TextField
-                label="最大孔径"
+                label="最大孔距"
                 type="number"
-                value={formData.maxHoleDiameter}
-                onChange={(e) => setFormData({...formData, maxHoleDiameter: e.target.value})}
+                value={formData.maxHoleDistance}
+                onChange={(e) => setFormData({...formData, maxHoleDistance: e.target.value})}
                 fullWidth
               />
               <TextField
@@ -837,11 +823,17 @@ export default function PriceManagement() {
                 fullWidth
               />
               <TextField
+                label="螺纹价格"
                 type="number"
+                value={formData.threadingPrice}
+                onChange={(e) => setFormData({...formData, threadingPrice: e.target.value})}
                 fullWidth
               />
               <TextField
+                label="开槽价格"
                 type="number"
+                value={formData.groovingPrice}
+                onChange={(e) => setFormData({...formData, groovingPrice: e.target.value})}
                 fullWidth
               />
             </Box>
@@ -863,46 +855,31 @@ export default function PriceManagement() {
                   value={formData.category1}
                   onChange={(e) => setFormData({...formData, category1: e.target.value})}
                 >
-                  <MenuItem value="钻孔">钻孔</MenuItem>
-                  <MenuItem value="扣槽">扣槽</MenuItem>
-                  <MenuItem value="螺纹盲孔">螺纹盲孔</MenuItem>
-                  <MenuItem value="螺纹通孔">螺纹通孔</MenuItem>
+                  <MenuItem value="机械零件">机械零件</MenuItem>
+                  <MenuItem value="紧固件">紧固件</MenuItem>
+                  <MenuItem value="标准件">标准件</MenuItem>
+                  <MenuItem value="其他">其他</MenuItem>
                 </Select>
               </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>二级分类</InputLabel>
-                <Select
-                  value={formData.category2}
-                  onChange={(e) => setFormData({...formData, category2: e.target.value})}
-                >
-                  <MenuItem value="">无</MenuItem>
-                  <MenuItem value="ABS">ABS</MenuItem>
-                  <MenuItem value="非ABS">非ABS</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>三级分类</InputLabel>
-                <Select
-                  value={formData.category3}
-                  onChange={(e) => setFormData({...formData, category3: e.target.value})}
-                >
-                  <MenuItem value="">无</MenuItem>
-                  <MenuItem value="尖底">尖底</MenuItem>
-                  <MenuItem value="平底">平底</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>材质</InputLabel>
-                <Select
-                  value={formData.material}
-                  onChange={(e) => setFormData({...formData, material: e.target.value})}
-                >
-                  <MenuItem value="">无</MenuItem>
-                  <MenuItem value="不锈钢">不锈钢</MenuItem>
-                  <MenuItem value="普通材质">普通材质</MenuItem>
-                  <MenuItem value="09MnNiDⅢ">09MnNiDⅢ</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                label="二级分类"
+                value={formData.category2}
+                onChange={(e) => setFormData({...formData, category2: e.target.value})}
+                fullWidth
+              />
+              <TextField
+                label="三级分类"
+                value={formData.category3}
+                onChange={(e) => setFormData({...formData, category3: e.target.value})}
+                fullWidth
+              />
+              <TextField
+                label="材料"
+                value={formData.material}
+                onChange={(e) => setFormData({...formData, material: e.target.value})}
+                fullWidth
+                required
+              />
               <TextField
                 label="厚度"
                 type="number"
@@ -911,17 +888,17 @@ export default function PriceManagement() {
                 fullWidth
               />
               <TextField
-                label="最小孔径"
+                label="最小孔距"
                 type="number"
-                value={formData.minHoleDiameter}
-                onChange={(e) => setFormData({...formData, minHoleDiameter: e.target.value})}
+                value={formData.minHoleDistance}
+                onChange={(e) => setFormData({...formData, minHoleDistance: e.target.value})}
                 fullWidth
               />
               <TextField
-                label="最大孔径"
+                label="最大孔距"
                 type="number"
-                value={formData.maxHoleDiameter}
-                onChange={(e) => setFormData({...formData, maxHoleDiameter: e.target.value})}
+                value={formData.maxHoleDistance}
+                onChange={(e) => setFormData({...formData, maxHoleDistance: e.target.value})}
                 fullWidth
               />
               <TextField
@@ -967,11 +944,17 @@ export default function PriceManagement() {
                 fullWidth
               />
               <TextField
+                label="螺纹价格"
                 type="number"
+                value={formData.threadingPrice}
+                onChange={(e) => setFormData({...formData, threadingPrice: e.target.value})}
                 fullWidth
               />
               <TextField
+                label="开槽价格"
                 type="number"
+                value={formData.groovingPrice}
+                onChange={(e) => setFormData({...formData, groovingPrice: e.target.value})}
                 fullWidth
               />
             </Box>

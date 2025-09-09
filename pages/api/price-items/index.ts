@@ -58,21 +58,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     category3,
     material,
     thickness,
-    minHoleDistance,
-    maxHoleDistance,
+    minHoleDiameter,
+    maxHoleDiameter,
     minHoles,
     maxHoles,
     f25Price,
     f26Price,
     f27Price,
-    f28Price,
-    threadingPrice,
-    groovingPrice
+    f28Price
   } = req.body;
 
   // 验证必填字段
-  if (!category1 || !material) {
-    return res.status(400).json({ error: '缺少必填字段：一级分类和材料' });
+  if (!category1) {
+    return res.status(400).json({ error: '缺少必填字段：一级分类' });
   }
 
   try {
@@ -80,18 +78,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       category1,
       category2: category2 || null,
       category3: category3 || null,
-      material,
+      material: material || null,
       thickness: thickness ? thickness.toString() : null,
-      minHoleDistance: minHoleDistance ? minHoleDistance.toString() : null,
-      maxHoleDistance: maxHoleDistance ? maxHoleDistance.toString() : null,
+      minHoleDiameter: minHoleDiameter ? minHoleDiameter.toString() : null,
+      maxHoleDiameter: maxHoleDiameter ? maxHoleDiameter.toString() : null,
       minHoles: minHoles ? parseInt(minHoles) : null,
       maxHoles: maxHoles ? parseInt(maxHoles) : null,
       f25Price: f25Price ? f25Price.toString() : null,
       f26Price: f26Price ? f26Price.toString() : null,
       f27Price: f27Price ? f27Price.toString() : null,
       f28Price: f28Price ? f28Price.toString() : null,
-      threadingPrice: threadingPrice ? threadingPrice.toString() : null,
-      groovingPrice: groovingPrice ? groovingPrice.toString() : null,
     }).returning();
 
     return res.status(201).json(result[0]);
