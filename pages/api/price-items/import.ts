@@ -148,7 +148,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           category2: cleanStringValue(row[1]), // 可选：ABS/非ABS
           category3: cleanStringValue(row[2]), // 可选：尖底/平底
           material: cleanStringValue(row[3]),  // 可选：不锈钢/普通材质/09MnNiDⅢ
-          thickness: cleanNumericValue(row[4]), // 厚度
+          thickness: cleanIntegerValue(row[4]), // 厚度 - 修改为整数
           minHoleDiameter: cleanNumericValue(row[5]), // 最小孔径
           maxHoleDiameter: cleanNumericValue(row[6]), // 最大孔径
           minHoles: cleanIntegerValue(row[7]), // 最小孔数
