@@ -154,7 +154,7 @@ GET  /api/quotes/[id]         # 获取报价详情
 PUT  /api/quotes/[id]         # 更新报价
 DELETE /api/quotes/[id]       # 删除报价
 POST /api/quotes/export       # 导出选中报价
-POST /api/quotes/match-price  # 实时价格匹配
+POST /api/quotes/price-match  # 实时价格匹配
 ```
 
 ## 🚀 部署说明

@@ -21,6 +21,7 @@ import {
 } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import axios from "axios";
+import RouteGuard from "../components/RouteGuard";
 
 interface User {
   id: number;
@@ -60,7 +61,7 @@ export default function Home() {
   if (loading) return null; // RouteGuard 会显示加载状态
 
   return (
-    <>
+    <RouteGuard>
       <Head>
         <title>半自动报价系统 - 仪表板</title>
         <meta name="description" content="半自动报价系统管理面板" />
@@ -214,6 +215,6 @@ export default function Home() {
           </Box>
         </Box>
       </Container>
-    </>
+    </RouteGuard>
   );
 }
