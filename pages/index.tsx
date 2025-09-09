@@ -29,13 +29,22 @@ interface User {
   role: string;
 }
 
+interface DashboardStats {
+  priceItemsCount: number;
+  quotesCount: number;
+  todayQuotesCount: number;
+  systemStatus: string;
+}
+
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchUser();
+    fetchStats();
   }, []);
 
   const fetchUser = async () => {
@@ -46,6 +55,15 @@ export default function Home() {
       // 用户未登录，页面会被 RouteGuard 重定向
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get('/api/dashboard/stats', { withCredentials: true });
+      setStats(response.data);
+    } catch (error) {
+      console.error('获取统计数据失败:', error);
     }
   };
 
@@ -178,7 +196,7 @@ export default function Home() {
                   单价记录数
                 </Typography>
                 <Typography variant="h4">
-                  -
+                  {stats?.priceItemsCount ?? '-'}
                 </Typography>
               </CardContent>
             </Card>
@@ -188,7 +206,7 @@ export default function Home() {
                   报价单数
                 </Typography>
                 <Typography variant="h4">
-                  -
+                  {stats?.quotesCount ?? '-'}
                 </Typography>
               </CardContent>
             </Card>
@@ -198,7 +216,7 @@ export default function Home() {
                   今日报价
                 </Typography>
                 <Typography variant="h4">
-                  -
+                  {stats?.todayQuotesCount ?? '-'}
                 </Typography>
               </CardContent>
             </Card>
@@ -207,8 +225,11 @@ export default function Home() {
                 <Typography color="textSecondary" gutterBottom>
                   系统状态
                 </Typography>
-                <Typography variant="h4" color="success.main">
-                  正常
+                <Typography 
+                  variant="h4" 
+                  color={stats?.systemStatus === 'normal' ? 'success.main' : 'error.main'}
+                >
+                  {stats?.systemStatus === 'normal' ? '正常' : '异常'}
                 </Typography>
               </CardContent>
             </Card>
