@@ -13,7 +13,7 @@ export const users = pgTable('users', {
 // 单价表
 export const priceItems = pgTable('price_items', {
   id: serial('id').primaryKey(),
-  category1: varchar('category1', { length: 50 }).notNull(), // 钻孔/扣槽/螺纹盲孔/螺纹通孔 - 必填
+  category1: varchar('category1', { length: 50 }).notNull(), // 钻孔/抠槽/螺纹盲孔/螺纹通孔 - 必填
   category2: varchar('category2', { length: 50 }), // ABS/非ABS - 可空
   category3: varchar('category3', { length: 50 }), // 尖底/平底 - 可空
   material: varchar('material', { length: 100 }), // 不锈钢/普通材质/09MnNiDⅢ - 可空

@@ -734,7 +734,7 @@ export default function PriceManagement() {
                   onChange={(e) => setFormData({...formData, category1: e.target.value})}
                 >
                   <MenuItem value="钻孔">钻孔</MenuItem>
-                  <MenuItem value="扣槽">扣槽</MenuItem>
+                  <MenuItem value="抠槽">抠槽</MenuItem>
                   <MenuItem value="螺纹盲孔">螺纹盲孔</MenuItem>
                   <MenuItem value="螺纹通孔">螺纹通孔</MenuItem>
                 </Select>
@@ -864,7 +864,7 @@ export default function PriceManagement() {
                   onChange={(e) => setFormData({...formData, category1: e.target.value})}
                 >
                   <MenuItem value="钻孔">钻孔</MenuItem>
-                  <MenuItem value="扣槽">扣槽</MenuItem>
+                  <MenuItem value="抠槽">抠槽</MenuItem>
                   <MenuItem value="螺纹盲孔">螺纹盲孔</MenuItem>
                   <MenuItem value="螺纹通孔">螺纹通孔</MenuItem>
                 </Select>

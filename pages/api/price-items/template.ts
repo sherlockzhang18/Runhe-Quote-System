@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         '4.00'
       ],
       [
-        '扣槽',
+        '抠槽',
         '非ABS',
         '平底',
         '普通材质',

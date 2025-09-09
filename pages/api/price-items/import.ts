@@ -144,7 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         // 根据模板映射列数据，应用数据清理
         const rawData = {
-          category1: cleanStringValue(row[0]), // 必填：钻孔/扣槽/螺纹盲孔/螺纹通孔
+          category1: cleanStringValue(row[0]), // 必填：钻孔/抠槽/螺纹盲孔/螺纹通孔
           category2: cleanStringValue(row[1]), // 可选：ABS/非ABS
           category3: cleanStringValue(row[2]), // 可选：尖底/平底
           material: cleanStringValue(row[3]),  // 可选：不锈钢/普通材质/09MnNiDⅢ
@@ -167,7 +167,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // 验证一级分类的有效值
-        const validCategory1 = ['钻孔', '扣槽', '螺纹盲孔', '螺纹通孔'];
+        const validCategory1 = ['钻孔', '抠槽', '螺纹盲孔', '螺纹通孔'];
         if (!validCategory1.includes(rawData.category1)) {
           importResults.errors.push(`第${i + 2}行：一级分类必须是：${validCategory1.join('、')}`);
           importResults.failed++;

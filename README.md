@@ -46,7 +46,7 @@
 - min_holes, max_holes: 孔数范围
 - f25_price, f26_price, f27_price, f28_price: 各年份单价
 - threading_price: 攻螺纹单价
-- grooving_price: 扣槽单价
+- grooving_price: 抠槽单价
 - created_at, updated_at: 时间戳
 ```
 
@@ -62,7 +62,7 @@
 - quantity: 数量
 - unit_price: 单价 (自动匹配)
 - threading_price: 攻螺纹单价 (自动匹配)
-- grooving_price: 扣槽单价 (自动匹配)
+- grooving_price: 抠槽单价 (自动匹配)
 - subtotal: 小计 (自动计算)
 - notes: 备注
 - status: 状态 (draft/confirmed/exported)
@@ -93,12 +93,12 @@
 返回结果：
 - unit_price: 对应年份单价 (F25/F26/F27/F28)
 - threading_price: 攻螺纹单价
-- grooving_price: 扣槽单价
+- grooving_price: 抠槽单价
 ```
 
 ### 3. 报价计算逻辑
 ```javascript
-小计 = (单价 + 攻螺纹单价 + 扣槽单价) × 数量
+小计 = (单价 + 攻螺纹单价 + 抠槽单价) × 数量
 ```
 
 ## 📋 页面结构设计
