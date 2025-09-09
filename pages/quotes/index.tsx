@@ -162,7 +162,7 @@ export default function QuotesListPage() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `报价单_${quote.quoteNumber}.xlsx`;
+        a.download = `报价单_${quote.quoteNumber}.csv`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -367,7 +367,7 @@ export default function QuotesListPage() {
           </MenuItem>
           <MenuItem onClick={() => selectedQuote && handleExportQuote(selectedQuote)}>
             <ExportIcon sx={{ mr: 1 }} fontSize="small" />
-            导出Excel
+            导出CSV
           </MenuItem>
           <MenuItem 
             onClick={() => selectedQuote && handleDeleteQuote(selectedQuote)}

@@ -3,7 +3,6 @@ import { db } from '../../../../lib/db';
 import { quotes } from '../../../../drizzle/schema';
 import { requireUser } from '../../../../lib/auth';
 import { eq } from 'drizzle-orm';
-import * as XLSX from 'xlsx';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -37,77 +36,122 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const quote = result[0];
 
-    // 创建Excel工作簿
-    const workbook = XLSX.utils.book_new();
+    // 获取当前日期
+    const currentDate = new Date().toLocaleDateString('zh-CN');
 
-    // 准备报价数据
-    const quoteData = [
-      ['报价单信息', ''],
-      ['报价单号', quote.quoteNumber],
-      ['项目名称', quote.projectName || ''],
-      ['客户名称', quote.customerName || ''],
-      ['创建时间', quote.createdAt ? new Date(quote.createdAt).toLocaleString() : ''],
-      ['状态', quote.status === 'draft' ? '草稿' : quote.status === 'confirmed' ? '已确认' : '已导出'],
-      ['', ''],
-      ['规格信息', ''],
-      ['旧物料编号', quote.oldMaterialCode || ''],
-      ['SAP物料', quote.sapMaterialCode || ''],
-      ['物料描述', quote.materialDescription || ''],
-      ['版本号', quote.versionNumber || ''],
-      ['加工内容', quote.processingContent || ''],
-      ['管板材质', quote.tubePlateMaterial || ''],
-      ['价格年份', quote.priceYear || ''],
-      ['', ''],
-      ['尺寸信息', ''],
-      ['厚度', quote.thickness || ''],
-      ['长/直径', quote.lengthOrDiameter || ''],
-      ['宽', quote.width || ''],
-      ['', ''],
-      ['加工信息', ''],
-      ['钻孔孔径', quote.drillingHoleDiameter || ''],
-      ['钻孔孔数', quote.drillingHoleCount?.toString() || ''],
-      ['钻孔单价', quote.drillingUnitPrice || ''],
-      ['螺纹类别', quote.threadCategory || ''],
-      ['螺纹孔型号', quote.threadSpecification || ''],
-      ['螺纹孔数', quote.threadHoleCount?.toString() || ''],
-      ['类别三', quote.category3 || ''],
-      ['攻螺纹单价', quote.threadingUnitPrice || ''],
-      ['抠槽孔数', quote.groovingHoleCount?.toString() || ''],
-      ['抠槽单价', quote.groovingUnitPrice || ''],
-      ['', ''],
-      ['价格计算', ''],
-      ['钻孔费用', quote.drillingUnitPrice && quote.drillingHoleCount ? 
-        `${quote.drillingUnitPrice} × ${quote.drillingHoleCount} = ${(parseFloat(quote.drillingUnitPrice) * quote.drillingHoleCount).toFixed(2)}` : ''],
-      ['攻螺纹费用', quote.threadingUnitPrice && quote.threadHoleCount ? 
-        `${quote.threadingUnitPrice} × ${quote.threadHoleCount} = ${(parseFloat(quote.threadingUnitPrice) * quote.threadHoleCount).toFixed(2)}` : ''],
-      ['抠槽费用', quote.groovingUnitPrice && quote.groovingHoleCount ? 
-        `${quote.groovingUnitPrice} × ${quote.groovingHoleCount} = ${(parseFloat(quote.groovingUnitPrice) * quote.groovingHoleCount).toFixed(2)}` : ''],
-      ['总价', quote.totalPrice ? `¥${parseFloat(quote.totalPrice).toFixed(2)}` : ''],
-      ['', ''],
-      ['备注', quote.notes || ''],
+    // 状态转换
+    const getStatusText = (status: string) => {
+      switch (status) {
+        case 'draft': return '草稿';
+        case 'confirmed': return '已确认';
+        case 'exported': return '已导出';
+        default: return status;
+      }
+    };
+
+    // 计算价格
+    const drillingSubtotal = (parseFloat(quote.drillingUnitPrice || '0')) * (quote.drillingHoleCount || 0);
+    const threadingSubtotal = (parseFloat(quote.threadingUnitPrice || '0')) * (quote.threadHoleCount || 0);
+    const groovingSubtotal = (parseFloat(quote.groovingUnitPrice || '0')) * (quote.groovingHoleCount || 0);
+    const totalPrice = drillingSubtotal + threadingSubtotal + groovingSubtotal;
+
+    // 创建CSV表头和数据
+    const headers = [
+      '报价单号',
+      '项目名称', 
+      '客户名称',
+      '报价日期',
+      '价格年份',
+      '状态',
+      '老物料编号',
+      'SAP物料编号',
+      '物料描述',
+      '版本号',
+      '管板材质',
+      '加工内容',
+      '厚度(mm)',
+      '长/直径(mm)',
+      '宽(mm)',
+      '钻孔孔径(mm)',
+      '钻孔孔数',
+      '钻孔单价(元)',
+      '钻孔小计(元)',
+      '螺纹类别',
+      '螺纹规格',
+      '螺纹孔数',
+      '螺纹单价(元)',
+      '螺纹小计(元)',
+      '抠槽孔数',
+      '抠槽单价(元)',
+      '抠槽小计(元)',
+      '合计总价(元)',
+      '备注',
+      '创建时间',
+      '生成时间'
     ];
 
-    // 创建工作表
-    const worksheet = XLSX.utils.aoa_to_sheet(quoteData);
-
-    // 设置列宽
-    worksheet['!cols'] = [
-      { width: 20 }, // 标签列
-      { width: 30 }, // 值列
+    const values = [
+      quote.quoteNumber || '',
+      quote.projectName || '',
+      quote.customerName || '',
+      currentDate,
+      quote.priceYear || '',
+      getStatusText(quote.status || ''),
+      quote.oldMaterialCode || '',
+      quote.sapMaterialCode || '',
+      quote.materialDescription || '',
+      quote.versionNumber || '',
+      quote.tubePlateMaterial || '',
+      quote.processingContent || '',
+      quote.thickness || '',
+      quote.lengthOrDiameter || '',
+      quote.width || '',
+      quote.drillingHoleDiameter || '',
+      quote.drillingHoleCount || '',
+      quote.drillingUnitPrice || '',
+      drillingSubtotal.toFixed(2),
+      quote.threadCategory || '',
+      quote.threadSpecification || '',
+      quote.threadHoleCount || '',
+      quote.threadingUnitPrice || '',
+      threadingSubtotal.toFixed(2),
+      quote.groovingHoleCount || '',
+      quote.groovingUnitPrice || '',
+      groovingSubtotal.toFixed(2),
+      totalPrice.toFixed(2),
+      quote.notes || '',
+      quote.createdAt ? new Date(quote.createdAt).toLocaleString('zh-CN') : '',
+      new Date().toLocaleString('zh-CN')
     ];
 
-    // 添加工作表到工作簿
-    XLSX.utils.book_append_sheet(workbook, worksheet, '报价单');
+    // 转义CSV字段（处理包含逗号、引号或换行符的字段）
+    const escapeCSVField = (field: string | number) => {
+      const stringField = String(field);
+      if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+        return `"${stringField.replace(/"/g, '""')}"`;
+      }
+      return stringField;
+    };
 
-    // 生成Excel缓冲区
-    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    // 生成CSV内容
+    const csvHeaders = headers.map(escapeCSVField).join(',');
+    const csvValues = values.map(escapeCSVField).join(',');
+    const csvContent = `${csvHeaders}\n${csvValues}`;
+
+    // 添加BOM以确保Excel正确显示中文
+    const BOM = '\uFEFF';
+    const csvWithBOM = BOM + csvContent;
+
+    // 创建安全的文件名
+    const fileName = `报价单_${quote.quoteNumber || 'unknown'}.csv`;
+    const encodedFileName = encodeURIComponent(fileName);
 
     // 设置响应头
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="报价单_${quote.quoteNumber}.xlsx"`);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFileName}`);
 
-    // 发送Excel文件
-    res.send(excelBuffer);
+    // 发送CSV文件
+    res.send(csvWithBOM);
 
   } catch (error) {
     console.error('导出报价失败:', error);

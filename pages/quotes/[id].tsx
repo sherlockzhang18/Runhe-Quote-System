@@ -96,7 +96,7 @@ export default function QuoteDetailPage() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `报价单_${quote?.quoteNumber}.xlsx`;
+        a.download = `报价单_${quote?.quoteNumber}.csv`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -220,7 +220,7 @@ export default function QuoteDetailPage() {
               startIcon={<ExportIcon />}
               onClick={handleExport}
             >
-              导出Excel
+              导出CSV
             </Button>
           </Box>
         </Box>
