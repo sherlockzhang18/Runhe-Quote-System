@@ -620,8 +620,6 @@ git push origin feature/new-feature
 
 <div align="center">
 
-**🚀 半自动报价系统 - 让报价更智能，让业务更高效！**
-
-Made with ❤️ by [sherlockzhang18](https://github.com/sherlockzhang18)
+Made] by [sherlockzhang18](https://github.com/sherlockzhang18)
 
 </div>
