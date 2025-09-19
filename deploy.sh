@@ -113,11 +113,7 @@ wait_for_database() {
 run_migrations() {
     print_status "Setting up database schema..."
     
-    # Generate database schema (for first-time setup)
-    print_status "Generating database schema..."
-    docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:generate
-    
-    # Run migrations
+    # Run migrations (schema files are pre-generated)
     print_status "Running database migrations..."
     docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:migrate
     

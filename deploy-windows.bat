@@ -117,7 +117,7 @@ if errorlevel 1 (
     timeout /t 10 /nobreak >nul
 )
 
-REM Run database migrations (schema is built into the app)
+REM Run database migrations (schema files are pre-generated)
 echo 🗄️ Running database migrations...
 docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:migrate
 
