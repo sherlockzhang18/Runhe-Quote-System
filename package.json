@@ -26,6 +26,7 @@
     "bcrypt": "^6.0.0",
     "cookie": "^1.0.2",
     "dotenv": "^16.5.0",
+    "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.44.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
@@ -35,6 +36,7 @@
     "postgres": "^3.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "tsx": "^4.7.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -43,10 +45,8 @@
     "@types/pg": "^8.15.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "drizzle-kit": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "tsx": "^4.7.0",
     "typescript": "^5"
   }
 }
