@@ -5,7 +5,9 @@
   "scripts": {
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:migrate": "drizzle-kit migrate",
-    "dev": "next dev",
+    "dev": "cp .env.local .env && next dev",
+    "dev:docker": "docker-compose up -d",
+    "dev:local": "cp .env.local .env && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
