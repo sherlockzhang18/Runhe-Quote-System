@@ -107,19 +107,27 @@ echo ✅ Services started!
 
 REM Wait for database to be ready
 echo ⏳ Waiting for database to be ready...
-timeout /t 15 /nobreak >nul
+if "%OS%"=="Windows_NT" (
+    timeout /t 15 /nobreak >nul
+) else (
+    sleep 15
+)
 
 REM Check if database is accessible
 echo 🔍 Testing database connection...
 docker-compose -f docker-compose.prod.yml exec -T postgres pg_isready -U postgres
 if errorlevel 1 (
     echo ⚠️ Database not ready, waiting additional 10 seconds...
-    timeout /t 10 /nobreak >nul
+    if "%OS%"=="Windows_NT" (
+        timeout /t 10 /nobreak >nul
+    ) else (
+        sleep 10
+    )
 )
 
-REM Run database migrations (schema files are pre-generated)
+REM Run database migrations (using direct SQL)
 echo 🗄️ Running database migrations...
-docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:migrate
+docker-compose -f docker-compose.prod.yml exec -T app npm run migrate:deploy
 
 if errorlevel 1 (
     echo ⚠️ Database migration might have failed, checking logs...

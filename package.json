@@ -5,6 +5,7 @@
   "scripts": {
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:migrate": "drizzle-kit migrate",
+    "migrate:deploy": "node scripts/run-migrations.js",
     "create-admin": "npx tsx scripts/create-admin.ts",
     "dev": "cp .env.local .env && next dev",
     "dev:docker": "docker-compose up -d",
