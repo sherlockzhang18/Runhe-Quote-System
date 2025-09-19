@@ -107,15 +107,70 @@ echo ✅ Services started!
 
 REM Wait for database to be ready
 echo ⏳ Waiting for database to be ready...
-timeout /t 10 /nobreak >nul
+timeout /t 15 /nobreak >nul
+
+REM Check if database is accessible
+echo 🔍 Testing database connection...
+docker-compose -f docker-compose.prod.yml exec -T postgres pg_isready -U postgres
+if errorlevel 1 (
+    echo ⚠️ Database not ready, waiting additional 10 seconds...
+    timeout /t 10 /nobreak >nul
+)
+
+REM Generate database schema (for first-time setup)
+echo 🗄️ Generating database schema...
+docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:generate
 
 REM Run database migrations
-echo 🗄️ Setting up database schema...
+echo 🗄️ Running database migrations...
 docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:migrate
 
 if errorlevel 1 (
-    echo ⚠️ Database migration might have failed, but continuing...
+    echo ⚠️ Database migration might have failed, checking logs...
+    docker-compose -f docker-compose.prod.yml logs app
 )
+
+REM Create initial admin user (if needed)
+echo 👤 Setting up initial admin user...
+docker-compose -f docker-compose.prod.yml exec -T app node -e "
+const bcrypt = require('bcrypt');
+const { Pool } = require('pg');
+
+async function createAdminUser() {
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_URL,
+  });
+  
+  try {
+    // Check if admin user already exists
+    const existingUser = await pool.query('SELECT id FROM users WHERE username = \$1', ['admin']);
+    if (existingUser.rows.length > 0) {
+      console.log('✅ Admin user already exists');
+      return;
+    }
+    
+    // Create admin user
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await pool.query(
+      'INSERT INTO users (username, password_hash, role) VALUES (\$1, \$2, \$3)',
+      ['admin', hashedPassword, 'admin']
+    );
+    console.log('✅ Admin user created successfully');
+    console.log('Username: admin');
+    console.log('Password: admin123');
+    console.log('⚠️ Please change the password after first login!');
+  } catch (error) {
+    console.log('⚠️ Could not create admin user:', error.message);
+    console.log('You may need to create users manually');
+  } finally {
+    await pool.end();
+  }
+}
+
+createAdminUser();
+"
+
+echo ✅ Database setup completed!
 
 REM Check if services are running
 echo 🔍 Verifying deployment...
@@ -127,8 +182,8 @@ echo 📋 Creating backup script...
 echo @echo off
 echo REM Database backup script
 echo echo Creating database backup...
-echo docker-compose -f docker-compose.prod.yml exec -T postgres pg_dump -U postgres quotes_db ^> backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.sql
-echo echo Backup completed!
+echo docker-compose -f docker-compose.prod.yml exec -T postgres pg_dump -U postgres nextjs_db ^> backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.sql
+echo echo Backup completed: backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.sql
 echo pause
 ) > backup.bat
 
@@ -161,7 +216,17 @@ echo.
 echo 📋 IMPORTANT INFORMATION:
 echo ------------------------
 echo 🌐 Application URL: http://localhost:3000
-echo � Environment: Using existing .env file
+echo 📁 Environment: Using existing .env file
+echo.
+echo 👤 Default Admin Account:
+echo   Username: admin  
+echo   Password: admin123
+echo   ⚠️ Please change password after first login!
+echo.
+echo 🌐 Network Access Instructions:
+echo   1. Find your IP: ipconfig (look for IPv4 Address)
+echo   2. Access from other devices: http://YOUR-IP:3000
+echo   3. Make sure Windows Firewall allows port 3000
 echo.
 echo 📁 Files created:
 echo   - .env (environment configuration)

@@ -113,10 +113,55 @@ wait_for_database() {
 run_migrations() {
     print_status "Setting up database schema..."
     
+    # Generate database schema (for first-time setup)
+    print_status "Generating database schema..."
+    docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:generate
+    
     # Run migrations
+    print_status "Running database migrations..."
     docker-compose -f docker-compose.prod.yml exec -T app npm run drizzle:migrate
     
-    print_success "Database schema created!"
+    # Create initial admin user (if needed)
+    print_status "Setting up initial admin user..."
+    docker-compose -f docker-compose.prod.yml exec -T app node -e "
+const bcrypt = require('bcrypt');
+const { Pool } = require('pg');
+
+async function createAdminUser() {
+  const pool = new Pool({
+    connectionString: process.env.POSTGRES_URL,
+  });
+  
+  try {
+    // Check if admin user already exists
+    const existingUser = await pool.query('SELECT id FROM users WHERE username = \$1', ['admin']);
+    if (existingUser.rows.length > 0) {
+      console.log('✅ Admin user already exists');
+      return;
+    }
+    
+    // Create admin user
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await pool.query(
+      'INSERT INTO users (username, password_hash, role) VALUES (\$1, \$2, \$3)',
+      ['admin', hashedPassword, 'admin']
+    );
+    console.log('✅ Admin user created successfully');
+    console.log('Username: admin');
+    console.log('Password: admin123');
+    console.log('⚠️ Please change the password after first login!');
+  } catch (error) {
+    console.log('⚠️ Could not create admin user:', error.message);
+    console.log('You may need to create users manually');
+  } finally {
+    await pool.end();
+  }
+}
+
+createAdminUser();
+"
+    
+    print_success "Database setup completed!"
 }
 
 # Check if services are running
