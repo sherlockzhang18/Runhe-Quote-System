@@ -5,6 +5,7 @@
   "scripts": {
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:migrate": "drizzle-kit migrate",
+    "create-admin": "npx tsx scripts/create-admin.ts",
     "dev": "cp .env.local .env && next dev",
     "dev:docker": "docker-compose up -d",
     "dev:local": "cp .env.local .env && next dev",
@@ -45,6 +46,7 @@
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
+    "tsx": "^4.7.0",
     "typescript": "^5"
   }
 }
