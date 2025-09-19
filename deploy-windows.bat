@@ -14,6 +14,26 @@ echo   3. Make sure Windows Firewall allows port 3000tire application on Windows
 echo 🚀 Starting Quote System Deployment for Windows...
 echo ================================================
 
+REM Verify we're in the right directory by checking for key files
+echo 🔍 Verifying project directory...
+if not exist "package.json" (
+    echo ❌ package.json not found!
+    echo This doesn't appear to be the Quote System project directory.
+    echo Please navigate to the correct folder and run this script again.
+    pause
+    exit /b 1
+)
+
+if not exist "docker-compose.prod.yml" (
+    echo ❌ docker-compose.prod.yml not found!
+    echo This doesn't appear to be the Quote System project directory.
+    echo Please navigate to the correct folder and run this script again.
+    pause
+    exit /b 1
+)
+
+echo ✅ Project directory verified!
+
 REM Check if Docker is running
 docker version >nul 2>&1
 if errorlevel 1 (
@@ -28,13 +48,42 @@ echo ✅ Docker is running!
 
 REM Check if .env file exists
 echo 📝 Checking environment configuration...
-if not exist ".env" (
-    echo ❌ .env file not found!
-    echo Please make sure the .env file is included in your project directory.
-    pause
-    exit /b 1
+echo Current directory: %cd%
+
+REM Try multiple ways to check for .env file
+if exist ".env" (
+    echo ✅ Found .env file!
+    goto :env_found
 )
 
+REM Check with dir command (handles hidden files better)
+dir /a .env >nul 2>&1
+if not errorlevel 1 (
+    echo ✅ Found .env file (hidden)!
+    goto :env_found
+)
+
+REM If still not found, show detailed info
+echo ❌ .env file not found in current directory!
+echo.
+echo 🔍 Debugging information:
+echo Current directory: %cd%
+echo.
+echo All files in directory:
+dir /b
+echo.
+echo Hidden files:
+dir /a:h /b
+echo.
+echo Please make sure:
+echo 1. You are in the correct project directory
+echo 2. The .env file exists in this directory  
+echo 3. Run this script from the project root folder
+echo 4. The .env file is not corrupted
+pause
+exit /b 1
+
+:env_found
 echo ✅ Using existing .env file!
 
 REM Stop any existing services
